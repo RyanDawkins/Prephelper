@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Prep Helper</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="signin_heading">Sign in Please</string>
+
+    <string name="login_with_google">Login with Google+</string>
+
+    <string name="firebase_url">http://popping-heat-4242.firebaseIO.com</string>
+
+    <string name="login_heading">Please Login</string>
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+
+</resources>
