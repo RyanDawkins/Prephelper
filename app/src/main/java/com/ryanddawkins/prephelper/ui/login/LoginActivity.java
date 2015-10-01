@@ -1,14 +1,16 @@
 package com.ryanddawkins.prephelper.ui.login;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.support.annotation.Nullable;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import com.ryanddawkins.prephelper.R;
 import com.ryanddawkins.prephelper.base.BaseActivity;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
@@ -16,12 +18,15 @@ import butterknife.OnClick;
  */
 public class LoginActivity extends BaseActivity {
 
+    @Nullable
     @Bind(R.id.login_button)
     protected Button loginButton;
 
-    @Bind(R.id.username)
-    protected EditText usernameEditText;
+    @Nullable
+    @Bind(R.id.email)
+    protected EditText emailEditText;
 
+    @Nullable
     @Bind(R.id.password)
     protected EditText passwordEditText;
 
@@ -29,15 +34,19 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         // Adding layout to container
-        this.addLayoutToContainer(R.layout.activity_login);
+        FrameLayout container = this.addLayoutToContainer(R.layout.activity_login);
+        ButterKnife.bind(this, container);
 
         // Sets heading
         this.setTitle(this.getString(R.string.login_heading));
     }
 
-    @OnClick(R.id.login_button)
+    @Nullable @OnClick(R.id.login_button)
     public void loginButtonClicked() {
-        Log.d("LoginActivity", "Clicked Button");
+
+        String email = this.emailEditText.getText().toString();
+        String password = this.emailEditText.getText().toString();
+
     }
 
 }

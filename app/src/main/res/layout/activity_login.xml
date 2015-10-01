@@ -9,44 +9,48 @@
     android:orientation="vertical"
     tools:context="com.ryanddawkins.prephelper.ui.login.LoginActivity">
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello world" />
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/usernameTextInput"
+    <LinearLayout
         android:layout_centerVertical="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textColorHint="@color/accent_color">
-        <EditText
-            android:id="@+id/username"
+        android:orientation="vertical">
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/emailTextInput"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_username" />
-    </android.support.design.widget.TextInputLayout>
+            android:textColorHint="@color/accent_color">
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_email_label"
+                android:inputType="textEmailAddress" />
+        </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_below="@id/usernameTextInput"
-        android:id="@+id/passwordTextInput"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textColorHint="@color/accent_color">
-        <EditText
-            android:id="@+id/password"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/passwordTextInput"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_password" />
-    </android.support.design.widget.TextInputLayout>
+            android:textColorHint="@color/accent_color">
+            <EditText
+                android:id="@+id/password"
+                android:inputType="textPassword"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_password" />
+        </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/passwordTextInput"
-        android:background="@color/primary"
-        android:textColor="@color/grey_white_1000"
-        android:text="@string/login_button"/>
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:textColor="@color/grey_white_1000"
+            android:text="@string/login_button"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

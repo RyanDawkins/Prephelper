@@ -11,7 +11,8 @@
     <string name="firebase_url">http://popping-heat-4242.firebaseIO.com</string>
 
     <string name="login_heading">Please Login</string>
-    <string name="login_username">Username</string>
+    <string name="login_email">john.doe@gmail.com</string>
+    <string name="login_email_label">Email</string>
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
 

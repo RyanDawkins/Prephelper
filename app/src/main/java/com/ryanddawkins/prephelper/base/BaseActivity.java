@@ -150,12 +150,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.container, fragment, tag).commit();
     }
 
-    protected void addLayoutToContainer(@LayoutRes int layout) {
+    protected FrameLayout addLayoutToContainer(@LayoutRes int layout) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup group = (ViewGroup) inflater.inflate(layout, null, false);
         if(mContainerLayout != null) {
             mContainerLayout.addView(group);
             ButterKnife.bind(this, mContainerLayout);
         }
+        return mContainerLayout;
     }
 }
