@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.ryanddawkins.prephelper.R;
 
@@ -158,5 +159,14 @@ public abstract class BaseActivity extends AppCompatActivity {
             ButterKnife.bind(this, mContainerLayout);
         }
         return mContainerLayout;
+    }
+
+    protected void showToast(String message) {
+        this.showToast(message, false);
+    }
+
+    protected void showToast(String message, boolean isLong) {
+        Toast toast = Toast.makeText(this, message, isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

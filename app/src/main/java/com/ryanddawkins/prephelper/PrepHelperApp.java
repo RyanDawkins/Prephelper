@@ -2,6 +2,9 @@ package com.ryanddawkins.prephelper;
 
 import android.app.Application;
 
+import com.parse.Parse;
+import com.ryanddawkins.prephelper.data.auth.LoginAdapter;
+import com.ryanddawkins.prephelper.data.auth.ParseLoginAdapter;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -10,16 +13,25 @@ import com.squareup.leakcanary.LeakCanary;
 public class PrepHelperApp extends Application {
 
     private static PrepHelperApp mInstance;
+    public static PrepHelperApp getInstance() {
+        return mInstance;
+    }
+
+    private LoginAdapter loginAdapter;
 
     @Override public void onCreate() {
         super.onCreate();
         LeakCanary.install(this);
 
+        Parse.initialize(this);
+
         mInstance = this;
+
+        this.loginAdapter = new ParseLoginAdapter();
     }
 
-    public static PrepHelperApp getInstance() {
-        return mInstance;
+    public LoginAdapter getLoginAdapter() {
+        return this.loginAdapter;
     }
 
 }

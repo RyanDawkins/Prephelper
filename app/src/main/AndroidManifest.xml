@@ -17,13 +17,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.signup.SignUpActivity"
+            android:label="@string/signup_heading">
+        </activity>
+        <activity android:name=".ui.preps.PrepsActivity"
+            android:label="@string/hello_world">
+        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5821b308d11f4ace82358e89355bbb98576f5891" />
 
         <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="rWDN2U5PnYxNyULonHQUpMMLHPHtjsyOLAC35Bzw" />
+
+        <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="e4RNbOdmK08plW0hWx3uwK0k7e0lNCSMIip1emIt" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
