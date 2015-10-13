@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 
 import com.ryanddawkins.prephelper.R;
 import com.ryanddawkins.prephelper.base.BaseActivity;
-import com.ryanddawkins.prephelper.data.auth.ParseSignupAdapter;
+import com.ryanddawkins.prephelper.data.auth.parse.ParseSignupAdapter;
 import com.ryanddawkins.prephelper.data.auth.SignupAdapter;
 import com.ryanddawkins.prephelper.data.auth.SignupCallback;
 
@@ -63,7 +63,7 @@ public class SignUpActivity extends BaseActivity implements SignupCallback {
     }
 
     @Override public void signupSuccess() {
-        this.showToast("Successful Login!");
+        this.showToast("Successful Sign Up!");
         this.finish();
     }
 

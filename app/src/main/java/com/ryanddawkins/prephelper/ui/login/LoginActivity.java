@@ -56,7 +56,6 @@ public class LoginActivity extends BaseActivity implements LoginCallback {
         this.mApplication = PrepHelperApp.getInstance();
 
         this.mLoginAdapter = this.mApplication.getLoginAdapter();
-        this.mLoginAdapter.logout();
 
         // Sets heading
         this.setTitle(this.getString(R.string.login_heading));
@@ -68,7 +67,9 @@ public class LoginActivity extends BaseActivity implements LoginCallback {
 
     public void onStart() {
         super.onStart();
-        this.navigateToPrepsActivity();
+        if(this.mLoginAdapter.isLoggedIn()) {
+            this.navigateToPrepsActivity();
+        }
     }
 
     private void navigateToPrepsActivity() {

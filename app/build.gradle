@@ -13,7 +13,12 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
 }
 
 
@@ -77,4 +82,8 @@ dependencies {
     compile 'org.glassfish:javax.annotation:10.0-b28'
 
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+
+    compile('com.afollestad.material-dialogs:core:0.8.2.0@aar') {
+        transitive = true
+    }
 }

@@ -11,13 +11,14 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.ryanddawkins.prephelper.R;
 
@@ -37,6 +38,10 @@ public abstract class BaseActivity extends AppCompatActivity {
      * FragmentManager that this activity uses
      */
     protected FragmentManager mFragmentManager = null;
+
+    @Nullable
+    @Bind(R.id.main_content)
+    protected CoordinatorLayout mainContent;
 
     @Nullable
     @Bind(R.id.toolbar)
@@ -166,7 +171,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void showToast(String message, boolean isLong) {
-        Toast toast = Toast.makeText(this, message, isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
-        toast.show();
+        Snackbar snackbar = Snackbar.make(mainContent, message, isLong ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 }

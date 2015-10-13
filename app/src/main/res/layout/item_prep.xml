@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="@dimen/md_listitem_height"
+    android:id="@+id/prep">
+
+    <TextView
+        android:text="Example Text"
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/md_listitem_textsize"
+        android:layout_marginTop="@dimen/md_listitem_control_margin"
+        android:layout_marginBottom="@dimen/md_listitem_control_margin"
+        android:layout_marginLeft="@dimen/md_listitem_margin_left" />
+
+</LinearLayout>

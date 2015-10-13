@@ -1,10 +1,12 @@
-package com.ryanddawkins.prephelper.data.auth;
+package com.ryanddawkins.prephelper.data.auth.parse;
 
 import android.util.Log;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+import com.ryanddawkins.prephelper.data.auth.SignupAdapter;
+import com.ryanddawkins.prephelper.data.auth.SignupCallback;
 
 /**
  * Created by ryan on 10/6/15.

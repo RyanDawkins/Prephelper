@@ -1,10 +1,12 @@
-package com.ryanddawkins.prephelper.data.auth;
+package com.ryanddawkins.prephelper.data.auth.parse;
 
 import android.util.Log;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.ryanddawkins.prephelper.data.auth.LoginAdapter;
+import com.ryanddawkins.prephelper.data.auth.LoginCallback;
 
 /**
  * Created by ryan on 10/1/15.
@@ -36,13 +38,12 @@ public class ParseLoginAdapter implements LoginAdapter {
     }
 
     @Override public boolean isLoggedIn() {
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        return user != null && user.isAuthenticated();
+        return ParseUser.getCurrentUser() != null && ParseUser.getCurrentUser().isAuthenticated();
     }
 
     @Override public void logout() {
-        ParseUser.getCurrentUser().logOut();
+        if(ParseUser.getCurrentUser() != null) {
+            ParseUser.getCurrentUser().logOut();
+        }
     }
 }

@@ -21,8 +21,10 @@
             android:label="@string/signup_heading">
         </activity>
         <activity android:name=".ui.preps.PrepsActivity"
-            android:label="@string/hello_world">
+            android:label="@string/preps_heading">
         </activity>
+        <activity android:name=".ui.items.ItemsActivity"
+            android:label="@string/items_heading"></activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5821b308d11f4ace82358e89355bbb98576f5891" />

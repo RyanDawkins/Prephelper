@@ -6,20 +6,20 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/preps_list"
+        android:id="@+id/items_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_preps_fab"
+        android:id="@+id/add_items_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/ic_plus_sign"
-        app:layout_anchor="@id/preps_list"
+        app:layout_anchor="@id/items_list"
         app:layout_anchorGravity="bottom|right|end" />
 
 </android.support.design.widget.CoordinatorLayout>
