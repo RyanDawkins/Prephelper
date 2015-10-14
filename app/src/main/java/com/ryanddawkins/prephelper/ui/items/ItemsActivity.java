@@ -12,7 +12,8 @@ import android.widget.FrameLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ryanddawkins.prephelper.R;
-import com.ryanddawkins.prephelper.base.BaseActivity;
+import com.ryanddawkins.prephelper.base.BaseDrawerActivity;
+import com.ryanddawkins.prephelper.data.GetObjectCallback;
 import com.ryanddawkins.prephelper.data.pojo.Item;
 import com.ryanddawkins.prephelper.data.pojo.Prep;
 import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
@@ -20,8 +21,8 @@ import com.ryanddawkins.prephelper.data.storage.GetByIdCallback;
 import com.ryanddawkins.prephelper.data.storage.parse.ParseItemStorageAdapter;
 import com.ryanddawkins.prephelper.data.storage.parse.ParsePrepStorageAdapter;
 import com.ryanddawkins.prephelper.ui.ItemCallback;
-import com.ryanddawkins.prephelper.ui.preps.PrepsAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -31,7 +32,7 @@ import butterknife.OnClick;
 /**
  * Created by ryan on 10/11/15.
  */
-public class ItemsActivity extends BaseActivity implements ItemCallback<View>, GetAllCallback<Item>, GetByIdCallback<Prep> {
+public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<View>, GetObjectCallback<Item>, GetAllCallback<Item>, GetByIdCallback<Prep> {
 
     public static String PREP = "prep";
 
@@ -46,6 +47,7 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
     private ItemsActivity self;
     private ParseItemStorageAdapter itemStorageAdapter;
     private Prep prep;
+    private ItemsAdapter itemsAdapter;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +56,6 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_items);
         ButterKnife.bind(this, container);
 
-        setTitle(getString(R.string.preps_heading));
-
         this.self = this;
         this.itemStorageAdapter = new ParseItemStorageAdapter();
 
@@ -63,15 +63,29 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
         Intent intent = this.getIntent();
         String prepId = intent.getStringExtra(PREP);
 
-        this.itemsRecyclerView.setAdapter(new PrepsAdapter(null, this));
-        this.itemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        this.itemsAdapter = new ItemsAdapter(new ArrayList<Item>(), this);
+        if(this.itemsRecyclerView != null) {
+            this.itemsRecyclerView.setAdapter(this.itemsAdapter);
+            this.itemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
 
         if(prepId != null) {
             ParsePrepStorageAdapter parsePrepStorageAdapter = new ParsePrepStorageAdapter();
             parsePrepStorageAdapter.getPrepByIdAsync(this, prepId);
         } else {
-            this.updateItems();
+            this.itemStorageAdapter.getItemsAsync(this);
         }
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        setTitle(getString(R.string.items_heading));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
     }
 
     public void updateItems() {
@@ -79,13 +93,6 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
             this.itemStorageAdapter.getItemsAsync(this, this.prep);
         } else {
             this.itemStorageAdapter.getItemsAsync(this);
-        }
-    }
-
-    public void updateListAdapter(List<Item> items) {
-        if(this.itemsRecyclerView != null) {
-            this.itemsRecyclerView.setAdapter(new ItemsAdapter(items, this));
-            this.itemsRecyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 
@@ -102,7 +109,7 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
                         Item item = new Item();
                         item.setName(itemName);
                         self.itemStorageAdapter.createItem(self.prep, item);
-                        self.updateItems();
+                        itemsAdapter.addItem(item);
                     }
                 }).build();
         materialDialog.show();
@@ -116,14 +123,25 @@ public class ItemsActivity extends BaseActivity implements ItemCallback<View>, G
     }
 
     @Override
-    public void retrievedList(List<Item> list) {
-        this.updateListAdapter(list);
+    public void onItemLongClick(View view) {
+        // Nothing to do here...
+        // Yet.
     }
 
     @Override
     public void gotById(Prep object) {
         this.prep = object;
         this.showToast(this.prep.getName());
-        this.updateItems();
+        this.itemStorageAdapter.getItemsAsync(this, prep);
+    }
+
+    @Override
+    public void gotObjectCallback(Item item) {
+        this.itemsAdapter.addItem(item);
+    }
+
+    @Override
+    public void retrievedList(List<Item> list) {
+        this.itemsAdapter.replaceItems(list);
     }
 }

@@ -38,6 +38,21 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
         holder.setItemViewTag(R.id.item, item);
     }
 
+    public void addItem(Item i) {
+        this.items.add(i);
+        notifyItemChanged(items.size() - 1);
+    }
+
+    public void addList(List<Item> items) {
+        this.items.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    public void replaceItems(List<Item> items) {
+        this.items = items;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return this.items != null ? this.items.size() : 0;

@@ -1,5 +1,6 @@
 package com.ryanddawkins.prephelper.data.storage;
 
+import com.ryanddawkins.prephelper.data.GetObjectCallback;
 import com.ryanddawkins.prephelper.data.pojo.Item;
 import com.ryanddawkins.prephelper.data.pojo.Prep;
 
@@ -12,7 +13,7 @@ public interface ItemStorageAdapter {
 
     List<Item> getItems(Prep prep);
 
-    void getItemsAsync(final GetAllCallback<Item> callback, Prep prep);
+    void getItemsAsync(final GetObjectCallback<Item> callback, Prep prep);
 
     List<Item> getItems();
 

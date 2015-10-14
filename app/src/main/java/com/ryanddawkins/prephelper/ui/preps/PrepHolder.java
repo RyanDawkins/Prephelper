@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
 /**
  * Created by ryan on 10/10/15.
  */
-public class PrepHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class PrepHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     private View itemView;
     private ItemCallback<View> itemCallback;
@@ -33,6 +33,7 @@ public class PrepHolder extends RecyclerView.ViewHolder implements View.OnClickL
         this.itemView = itemView;
 
         itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
     }
 
     public PrepHolder(View itemView) {
@@ -52,5 +53,13 @@ public class PrepHolder extends RecyclerView.ViewHolder implements View.OnClickL
         if(this.itemView != null) {
             this.itemView.setTag(id, prep);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+
+        this.itemCallback.onItemLongClick(v);
+
+        return true;
     }
 }

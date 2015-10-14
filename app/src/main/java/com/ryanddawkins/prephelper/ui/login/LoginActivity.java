@@ -74,16 +74,16 @@ public class LoginActivity extends BaseActivity implements LoginCallback {
 
     private void navigateToPrepsActivity() {
         Intent intent = new Intent(this, PrepsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         this.startActivity(intent);
+        this.finish();
     }
 
     @Nullable @OnClick(R.id.login_button)
     public void loginButtonClicked() {
-
         String email = this.emailEditText.getText().toString();
         String password = this.passwordEditText.getText().toString();
-
         this.mLoginAdapter.loginAsync(this, email, password);
     }
 

@@ -11,9 +11,12 @@ import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
 import com.ryanddawkins.prephelper.data.storage.GetByIdCallback;
 import com.ryanddawkins.prephelper.data.storage.PrepStorageAdapter;
 import com.ryanddawkins.prephelper.data.storage.RetrievalException;
+import com.ryanddawkins.prephelper.data.storage.SaveCallback;
 import com.ryanddawkins.prephelper.data.storage.SaveException;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by ryan on 10/11/15.
@@ -35,6 +38,7 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
         try {
             return query.find();
         } catch (ParseException e) {
+            Timber.e(e.getMessage());
             throw new RetrievalException(e.getMessage());
         }
     }
@@ -49,6 +53,7 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
                 if (e == null) {
                     callback.retrievedList(list);
                 } else {
+                    Timber.e(e.getMessage());
                     throw new RetrievalException(e.getMessage());
                 }
             }
@@ -67,6 +72,7 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
         try {
             prep.save();
         } catch (ParseException e) {
+            Timber.e(e.getMessage());
             throw new SaveException(e.getMessage());
         }
 
@@ -83,6 +89,7 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
         try {
             return query.get(id);
         } catch (ParseException e) {
+            Timber.e(e.getMessage());
             return null;
         }
     }
@@ -97,6 +104,34 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
                     callback.gotById(prep);
                 } else {
                     throw new RetrievalException(e.getMessage());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void savePrep(Prep prep) {
+
+        try {
+            prep.save();
+        } catch (ParseException e) {
+            Timber.e(e.getMessage());
+        }
+    }
+
+    public void savePrepAsync(Prep prep) {
+        prep.saveInBackground();
+    }
+
+    public void savePrepAsync(Prep prep, final SaveCallback saveCallback) {
+        prep.saveInBackground(new com.parse.SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null) {
+                    saveCallback.finishedSaving();
+                } else {
+                    Timber.e(e.getMessage());
+                    throw new SaveException(e.getMessage());
                 }
             }
         });

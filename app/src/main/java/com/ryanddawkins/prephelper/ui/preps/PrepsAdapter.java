@@ -33,7 +33,6 @@ public class PrepsAdapter extends RecyclerView.Adapter<PrepHolder> {
 
     @Override
     public void onBindViewHolder(PrepHolder holder, int position) {
-
         Prep prep = this.preps.get(position);
         holder.setNameViewText(prep.getName());
         holder.setItemViewTag(R.id.prep, prep);

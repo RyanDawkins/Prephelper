@@ -14,23 +14,26 @@ import android.widget.FrameLayout;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ryanddawkins.prephelper.PrepHelperApp;
 import com.ryanddawkins.prephelper.R;
-import com.ryanddawkins.prephelper.base.BaseActivity;
+import com.ryanddawkins.prephelper.base.BaseDrawerActivity;
 import com.ryanddawkins.prephelper.data.pojo.Prep;
 import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
 import com.ryanddawkins.prephelper.data.storage.PrepStorageAdapter;
 import com.ryanddawkins.prephelper.ui.ItemCallback;
 import com.ryanddawkins.prephelper.ui.items.ItemsActivity;
+import com.ryanddawkins.prephelper.ui.login.LoginActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 /**
  * Created by ryan on 10/8/15.
  */
-public class PrepsActivity extends BaseActivity implements ItemCallback<View>, GetAllCallback<Prep> {
+public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<View>, GetAllCallback<Prep> {
 
     @Nullable
     @Bind(R.id.preps_list)
@@ -42,9 +45,17 @@ public class PrepsActivity extends BaseActivity implements ItemCallback<View>, G
 
     private PrepStorageAdapter prepStorageAdapter;
     private PrepsActivity self;
+    private List<Prep> prepsList;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(!PrepHelperApp.getInstance().getLoginAdapter().isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            this.startActivity(intent);
+        }
 
         this.self = this;
 
@@ -52,17 +63,20 @@ public class PrepsActivity extends BaseActivity implements ItemCallback<View>, G
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_preps);
         ButterKnife.bind(this, container);
 
-        setTitle(getString(R.string.items_heading));
-
         this.prepStorageAdapter = PrepHelperApp.getInstance().getPrepStorageAdapter();
 
         if(this.prepsRecyclerView != null) {
-            this.prepsRecyclerView.setAdapter(new PrepsAdapter(null, this));
+            this.prepsRecyclerView.setAdapter(new PrepsAdapter(new ArrayList<Prep>(), this));
             this.prepStorageAdapter.getPrepsAsync(this);
             this.prepsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         } else {
             Log.w("PrepsActivity", "Preps Recyclerview is nt present.");
         }
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        setTitle(getString(R.string.preps_heading));
     }
 
     public void updateListAdapter(List<Prep> preps) {
@@ -74,6 +88,27 @@ public class PrepsActivity extends BaseActivity implements ItemCallback<View>, G
             Log.w("PrepsActivity", "recyclerview is null");
             this.showToast("not good mann..");
         }
+    }
+
+    public void onItemLongClick(View view) {
+
+        Timber.d("Hopefully this happens");
+
+        final Prep prep = (Prep) view.getTag(R.id.prep);
+
+        MaterialDialog materialDialog = new MaterialDialog.Builder(this)
+                .title("Create new Prep")
+                .content("What's the name of your prep?")
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input("7 Day Snow Storm Supplies", prep.getName(), new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                        prep.setName(input.toString());
+                        prepStorageAdapter.savePrepAsync(prep);
+                        prepsRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                }).build();
+        materialDialog.show();
     }
 
     @Nullable @OnClick(R.id.add_preps_fab)
@@ -109,6 +144,7 @@ public class PrepsActivity extends BaseActivity implements ItemCallback<View>, G
 
     @Override
     public void retrievedList(List<Prep> list) {
+        this.prepsList = list;
         this.showToast("Received list..");
         this.updateListAdapter(list);
     }

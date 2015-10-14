@@ -21,4 +21,10 @@ public interface PrepStorageAdapter {
 
     void getPrepByIdAsync(GetByIdCallback<Prep> callback, String id);
 
+    void savePrep(Prep prep);
+
+    void savePrepAsync(Prep prep);
+
+    void savePrepAsync(Prep prep, SaveCallback saveCallback);
+
 }

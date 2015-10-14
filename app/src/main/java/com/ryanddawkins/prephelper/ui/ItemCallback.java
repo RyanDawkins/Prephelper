@@ -5,4 +5,6 @@ package com.ryanddawkins.prephelper.ui;
  */
 public interface ItemCallback<T> {
     void onItemClick(T t);
+
+    void onItemLongClick(T t);
 }

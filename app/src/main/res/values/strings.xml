@@ -26,4 +26,8 @@
 
     <string name="items_heading">Items</string>
 
+    <!-- Actions -->
+    <string name="action_preps">Preps</string>
+    <string name="action_items">Items</string>
+
 </resources>
