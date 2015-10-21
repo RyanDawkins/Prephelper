@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
 /**
  * Created by ryan on 10/10/15.
  */
-public class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     private View itemView;
     private ItemCallback<View> itemCallback;
@@ -33,6 +33,7 @@ public class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
         this.itemView = itemView;
 
         itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
     }
 
     public ItemHolder(View itemView) {
@@ -42,6 +43,12 @@ public class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
     @Override
     public void onClick(View v) {
         this.itemCallback.onItemClick(v);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        this.itemCallback.onItemLongClick(v);
+        return true;
     }
 
     public void setNameViewText(String text) {

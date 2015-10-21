@@ -1,14 +1,20 @@
 package com.ryanddawkins.prephelper.ui.items;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ryanddawkins.prephelper.R;
@@ -23,11 +29,12 @@ import com.ryanddawkins.prephelper.data.storage.parse.ParsePrepStorageAdapter;
 import com.ryanddawkins.prephelper.ui.ItemCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 /**
  * Created by ryan on 10/11/15.
@@ -48,13 +55,19 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     private ParseItemStorageAdapter itemStorageAdapter;
     private Prep prep;
     private ItemsAdapter itemsAdapter;
+    private boolean selectMode;
+
+    private Menu mMenu;
+
+    private HashMap<String, Boolean> selectedMap;
+    private List<View> selectedViews;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Adding layout to container
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_items);
-        ButterKnife.bind(this, container);
+        //ButterKnife.bind(this, container);
 
         this.self = this;
         this.itemStorageAdapter = new ParseItemStorageAdapter();
@@ -74,6 +87,8 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
             parsePrepStorageAdapter.getPrepByIdAsync(this, prepId);
         } else {
             this.itemStorageAdapter.getItemsAsync(this);
+            this.selectedMap = new HashMap<String, Boolean>();
+            this.selectedViews = new ArrayList<View>();
         }
     }
 
@@ -88,11 +103,71 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
         this.finish();
     }
 
+    @Override public void onDestroy() {
+        super.onDestroy();
+        this.selectedMap = null;
+        this.selectedViews = null;
+    }
+
     public void updateItems() {
         if(this.prep != null) {
             this.itemStorageAdapter.getItemsAsync(this, this.prep);
         } else {
             this.itemStorageAdapter.getItemsAsync(this);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.mMenu = menu;
+
+        this.updateMenu(R.menu.menu_main);
+
+        return true;
+    }
+
+    public void updateMenu(@LayoutRes int menuId) {
+        MenuInflater menuInflater = this.getMenuInflater();
+        menuInflater.inflate(menuId, this.mMenu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int itemId = item.getItemId();
+
+        switch(itemId) {
+            case R.id.action_cancel:
+                this.selectMode = false;
+                this.deselectViews();
+                break;
+
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void deselectViews() {
+        for(View view : this.selectedViews) {
+            selectItem(true, view);
+        }
+    }
+
+    public void selectItem(boolean wasSelected, View view) {
+
+        Item item = (Item) view.getTag(R.id.item);
+        this.selectedMap.put(item.getId(), !wasSelected);
+
+        this.selectItem(wasSelected, view);
+
+        TextView title = (TextView) view.findViewById(R.id.name);
+        if(wasSelected) {
+            view.setBackgroundColor(Color.TRANSPARENT);
+            title.setTextColor(getResources().getColor(R.color.black));
+        } else {
+            view.setBackgroundResource(R.color.accent_color);
+            title.setTextColor(getResources().getColor(R.color.grey_white_1000));
         }
     }
 
@@ -119,13 +194,30 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     @Override
     public void onItemClick(View view) {
         Item item = (Item) view.getTag(R.id.item);
-        this.showToast(item.getName());
+        if(this.selectMode) {
+            boolean wasSelected = false;
+            if(this.selectedMap.containsKey(item.getId())) {
+                wasSelected = (boolean) this.selectedMap.get(item.getId());
+            }
+            this.selectItem(wasSelected, view);
+
+        } else {
+            this.showToast(item.getName());
+        }
     }
 
     @Override
     public void onItemLongClick(View view) {
-        // Nothing to do here...
-        // Yet.
+        if(!this.selectMode && this.prep == null) {
+
+            this.updateMenu(R.menu.menu_items_select_mode);
+            this.selectMode = true;
+            this.selectItem(false, view);
+        }
+        else {
+            Timber.d("this.selectMode: '"+this.selectMode+"'");
+            Timber.d("Prep == null : '"+(this.prep == null)+"'");
+        }
     }
 
     @Override

@@ -13,4 +13,6 @@ public interface LoginAdapter {
 
     void logout();
 
+    User getUser();
+
 }

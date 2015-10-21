@@ -26,4 +26,9 @@ public class Item extends ParseObject {
         put("category", category);
         return this;
     }
+
+    public String getId() {
+        return getObjectId();
+    }
+
 }

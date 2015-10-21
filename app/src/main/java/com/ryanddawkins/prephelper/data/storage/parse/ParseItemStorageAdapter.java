@@ -107,7 +107,9 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
         PrepItem prepItem = new PrepItem();
         prepItem.put("user", this.currentUser);
         prepItem.setItem(item);
-        prepItem.setPrep(prep);
+        if(prep != null) {
+            prepItem.setPrep(prep);
+        }
         prepItem.setACL(parseACL);
         prepItem.saveInBackground();
     }

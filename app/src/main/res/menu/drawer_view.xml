@@ -2,8 +2,11 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_plus_sign"
-            android:title="Feed" />
+            android:id="@+id/action_preps"
+            android:title="@string/preps_heading" />
+        <item
+            android:id="@+id/action_items"
+            android:title="@string/items_heading"
+            />
     </group>
 </menu>

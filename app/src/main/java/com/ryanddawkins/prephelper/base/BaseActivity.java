@@ -11,12 +11,12 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -24,6 +24,7 @@ import com.ryanddawkins.prephelper.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 /**
  * Created by <a href="mailto:marcusandreog@gmail.com">Marcus Gabilheri</a>
@@ -38,10 +39,6 @@ public abstract class BaseActivity extends AppCompatActivity {
      * FragmentManager that this activity uses
      */
     protected FragmentManager mFragmentManager = null;
-
-    @Nullable
-    @Bind(R.id.main_content)
-    protected CoordinatorLayout mainContent;
 
     @Nullable
     @Bind(R.id.toolbar)
@@ -139,6 +136,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         return R.layout.activity_base;
     }
 
+    @LayoutRes
+    protected int getRootView() {
+        return R.id.main_content;
+    }
+
     /**
      * Adds a fragment to the Container of this activity otherwise will throw a exception
      * The tag of a fragment can be used in some situations. The most common used cases are:
@@ -162,16 +164,32 @@ public abstract class BaseActivity extends AppCompatActivity {
         if(mContainerLayout != null) {
             mContainerLayout.addView(group);
             ButterKnife.bind(this, mContainerLayout);
+            Timber.d("container layout not null");
+        } else {
+            Timber.d("container layout is null");
         }
         return mContainerLayout;
     }
+
+
 
     protected void showToast(String message) {
         this.showToast(message, false);
     }
 
     protected void showToast(String message, boolean isLong) {
-        Snackbar snackbar = Snackbar.make(mainContent, message, isLong ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT);
+
+        @LayoutRes
+        int rootView = getRootView();
+        View view = this.findViewById(rootView);
+
+        if(view == null) {
+            Timber.e("view is null, cannot show toast");
+            Timber.d("View id: '"+getLayoutResource()+"'");
+            return;
+        }
+
+        Snackbar snackbar = Snackbar.make(view, message, isLong ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
 }

@@ -7,6 +7,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.ryanddawkins.prephelper.data.auth.LoginAdapter;
 import com.ryanddawkins.prephelper.data.auth.LoginCallback;
+import com.ryanddawkins.prephelper.data.auth.User;
 
 /**
  * Created by ryan on 10/1/15.
@@ -46,4 +47,13 @@ public class ParseLoginAdapter implements LoginAdapter {
             ParseUser.getCurrentUser().logOut();
         }
     }
+
+    @Override public User getUser() {
+        if(this.isLoggedIn()) {
+            return new ParseUserAdapter(ParseUser.getCurrentUser());
+        } else {
+            return null;
+        }
+    }
+
 }

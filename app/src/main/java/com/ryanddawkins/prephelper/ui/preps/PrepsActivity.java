@@ -8,6 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -26,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
@@ -61,7 +63,7 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
         // Adding layout to container
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_preps);
-        ButterKnife.bind(this, container);
+        //ButterKnife.bind(this, container);
 
         this.prepStorageAdapter = PrepHelperApp.getInstance().getPrepStorageAdapter();
 
@@ -77,6 +79,27 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     @Override public void onStart() {
         super.onStart();
         setTitle(getString(R.string.preps_heading));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = this.getMenuInflater();
+        menuInflater.inflate(R.menu.menu_preps, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int itemId = item.getItemId();
+
+        switch(itemId) {
+            case R.id.action_add_existing_item:
+                Timber.d("YAY");
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void updateListAdapter(List<Prep> preps) {
@@ -125,6 +148,7 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
                         Prep prep = new Prep();
                         prep.setName(prepName);
+
 
                         self.prepStorageAdapter.createPrep(prep);
                         self.prepStorageAdapter.getPrepsAsync(self);
