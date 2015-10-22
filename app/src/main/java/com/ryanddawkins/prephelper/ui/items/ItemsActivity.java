@@ -12,9 +12,7 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ryanddawkins.prephelper.R;
@@ -22,6 +20,7 @@ import com.ryanddawkins.prephelper.base.BaseDrawerActivity;
 import com.ryanddawkins.prephelper.data.GetObjectCallback;
 import com.ryanddawkins.prephelper.data.pojo.Item;
 import com.ryanddawkins.prephelper.data.pojo.Prep;
+import com.ryanddawkins.prephelper.data.storage.AddedItemToPrepCallback;
 import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
 import com.ryanddawkins.prephelper.data.storage.GetByIdCallback;
 import com.ryanddawkins.prephelper.data.storage.parse.ParseItemStorageAdapter;
@@ -31,6 +30,7 @@ import com.ryanddawkins.prephelper.ui.ItemCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -39,9 +39,10 @@ import timber.log.Timber;
 /**
  * Created by ryan on 10/11/15.
  */
-public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<View>, GetObjectCallback<Item>, GetAllCallback<Item>, GetByIdCallback<Prep> {
+public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Integer>, GetObjectCallback<Item>, GetAllCallback<Item>, GetByIdCallback<Prep>, AddedItemToPrepCallback {
 
     public static String PREP = "prep";
+    public static String ADD_NEW_ITEMS = "addNewItemsToPrep";
 
     @Nullable
     @Bind(R.id.items_list)
@@ -51,23 +52,27 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     @Bind(R.id.add_items_fab)
     protected FloatingActionButton addItemsFab;
 
+    // UI Related Elements
+    private ItemsAdapter itemsAdapter;
     private ItemsActivity self;
     private ParseItemStorageAdapter itemStorageAdapter;
-    private Prep prep;
-    private ItemsAdapter itemsAdapter;
-    private boolean selectMode;
-
     private Menu mMenu;
 
-    private HashMap<String, Boolean> selectedMap;
-    private List<View> selectedViews;
+    // Data Elements
+    private List<Item> items;
+    private Prep prep;
+
+    // State Elements
+    private boolean selectMode;
+    private boolean addNewItemsToPrep;
+    private HashMap<Integer, Boolean> selectedMap;
+    private int itemsBeingAdded;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Adding layout to container
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_items);
-        //ButterKnife.bind(this, container);
 
         this.self = this;
         this.itemStorageAdapter = new ParseItemStorageAdapter();
@@ -76,25 +81,32 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
         Intent intent = this.getIntent();
         String prepId = intent.getStringExtra(PREP);
 
+        // Check if this is expecting to add new items to a prep
+        this.addNewItemsToPrep = intent.getBooleanExtra(ADD_NEW_ITEMS, false);
+
         this.itemsAdapter = new ItemsAdapter(new ArrayList<Item>(), this);
         if(this.itemsRecyclerView != null) {
             this.itemsRecyclerView.setAdapter(this.itemsAdapter);
             this.itemsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
 
+        this.selectedMap = new HashMap<Integer, Boolean>();
         if(prepId != null) {
             ParsePrepStorageAdapter parsePrepStorageAdapter = new ParsePrepStorageAdapter();
             parsePrepStorageAdapter.getPrepByIdAsync(this, prepId);
         } else {
             this.itemStorageAdapter.getItemsAsync(this);
-            this.selectedMap = new HashMap<String, Boolean>();
-            this.selectedViews = new ArrayList<View>();
         }
     }
 
     @Override public void onStart() {
         super.onStart();
         setTitle(getString(R.string.items_heading));
+
+        if(this.prep != null) {
+            this.itemsAdapter.replaceItems(new ArrayList<Item>());
+            this.itemStorageAdapter.getItemsAsync(this, prep);
+        }
     }
 
     @Override
@@ -106,7 +118,6 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     @Override public void onDestroy() {
         super.onDestroy();
         this.selectedMap = null;
-        this.selectedViews = null;
     }
 
     public void updateItems() {
@@ -127,6 +138,7 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     }
 
     public void updateMenu(@LayoutRes int menuId) {
+        this.mMenu.clear();
         MenuInflater menuInflater = this.getMenuInflater();
         menuInflater.inflate(menuId, this.mMenu);
     }
@@ -138,36 +150,60 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
         switch(itemId) {
             case R.id.action_cancel:
-                this.selectMode = false;
-                this.deselectViews();
+                this.finish();
                 break;
 
+            case R.id.action_add_existing_item:
+                Intent intent = new Intent(this, ItemsActivity.class);
+                intent.putExtra(ADD_NEW_ITEMS, true);
+                intent.putExtra(PREP, this.prep.getId());
+                this.startActivity(intent);
+                break;
 
+            case R.id.action_add_to_prep:
+                this.addSelectedItemsToExistingPrep();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void deselectViews() {
-        for(View view : this.selectedViews) {
-            selectItem(true, view);
+    public void addSelectedItemsToExistingPrep() {
+        Set<Integer> keys = this.selectedMap.keySet();
+        this.itemsBeingAdded = keys.size();
+        for(int key : keys) {
+            if(this.selectedMap.get(key)) {
+                this.itemStorageAdapter.addToPrepAsync(this, this.prep, this.items.get(key));
+            } else {
+                this.itemsBeingAdded--;
+            }
         }
+        this.finish();
     }
 
-    public void selectItem(boolean wasSelected, View view) {
+    public void deselectViews() {
+        Set<Integer> keys = this.selectedMap.keySet();
+        for(int key : keys) {
+            if(this.selectedMap.get(key)) {
+                this.selectItem(true, key);
+            }
+        }
+        this.selectedMap.clear();
+    }
 
-        Item item = (Item) view.getTag(R.id.item);
-        this.selectedMap.put(item.getId(), !wasSelected);
+    public void selectItem(boolean wasSelected, int position) {
 
-        this.selectItem(wasSelected, view);
+        Item item = this.items.get(position);
+        this.selectedMap.put(position, !wasSelected);
 
-        TextView title = (TextView) view.findViewById(R.id.name);
+        ItemHolder itemHolder = (ItemHolder) this.itemsRecyclerView.findViewHolderForAdapterPosition(position);
+
         if(wasSelected) {
-            view.setBackgroundColor(Color.TRANSPARENT);
-            title.setTextColor(getResources().getColor(R.color.black));
+            itemHolder.setTextColor(R.color.black);
+            itemHolder.setBackgroundColor(Color.TRANSPARENT);
         } else {
-            view.setBackgroundResource(R.color.accent_color);
-            title.setTextColor(getResources().getColor(R.color.grey_white_1000));
+            itemHolder.setBackgroundColorRes(R.color.accent_color);
+            itemHolder.setTextColor(R.color.grey_white_1000);
         }
     }
 
@@ -192,14 +228,14 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
 
     @Override
-    public void onItemClick(View view) {
-        Item item = (Item) view.getTag(R.id.item);
+    public void onItemClick(Integer position) {
+        Item item = this.items.get(position);
         if(this.selectMode) {
             boolean wasSelected = false;
-            if(this.selectedMap.containsKey(item.getId())) {
-                wasSelected = (boolean) this.selectedMap.get(item.getId());
+            if(this.selectedMap.containsKey(position)) {
+                wasSelected = (boolean) this.selectedMap.get(position);
             }
-            this.selectItem(wasSelected, view);
+            this.selectItem(wasSelected, position);
 
         } else {
             this.showToast(item.getName());
@@ -207,33 +243,52 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     }
 
     @Override
-    public void onItemLongClick(View view) {
-        if(!this.selectMode && this.prep == null) {
-
-            this.updateMenu(R.menu.menu_items_select_mode);
-            this.selectMode = true;
-            this.selectItem(false, view);
-        }
-        else {
-            Timber.d("this.selectMode: '"+this.selectMode+"'");
-            Timber.d("Prep == null : '"+(this.prep == null)+"'");
-        }
+    public void onItemLongClick(Integer position) {
+//        if(!this.selectMode && this.prep == null) {
+//
+//            this.updateMenu(R.menu.menu_items_select_mode);
+//            this.selectMode = true;
+//            this.selectItem(false, position);
+//        }
+//        else {
+//            Timber.d("this.selectMode: '"+this.selectMode+"'");
+//            Timber.d("Prep == null : '"+(this.prep == null)+"'");
+//        }
     }
 
     @Override
     public void gotById(Prep object) {
         this.prep = object;
+        this.items = new ArrayList<Item>();
         this.showToast(this.prep.getName());
-        this.itemStorageAdapter.getItemsAsync(this, prep);
+        if(this.addNewItemsToPrep) {
+            Timber.d("looking for items not in prep");
+            this.itemStorageAdapter.getItemsNotInPrepAsync(this, prep);
+            this.selectMode = true;
+            this.updateMenu(R.menu.menu_items_add_to_prep);
+        } else {
+            this.itemStorageAdapter.getItemsAsync(this, prep);
+            this.updateMenu(R.menu.menu_items_add_new_items_to_prep);
+        }
     }
 
     @Override
     public void gotObjectCallback(Item item) {
         this.itemsAdapter.addItem(item);
+        this.items.add(item);
     }
 
     @Override
     public void retrievedList(List<Item> list) {
+        this.items = list;
         this.itemsAdapter.replaceItems(list);
+    }
+
+    @Override
+    public void addItemToPrep() {
+        this.itemsBeingAdded--;
+        if(this.itemsBeingAdded == 0) {
+            this.finish();
+        }
     }
 }

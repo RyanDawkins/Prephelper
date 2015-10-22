@@ -9,16 +9,20 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.ryanddawkins.prephelper.data.GetObjectCallback;
 import com.ryanddawkins.prephelper.data.pojo.Item;
 import com.ryanddawkins.prephelper.data.pojo.Prep;
 import com.ryanddawkins.prephelper.data.pojo.PrepItem;
+import com.ryanddawkins.prephelper.data.storage.AddedItemToPrepCallback;
 import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
 import com.ryanddawkins.prephelper.data.storage.ItemStorageAdapter;
 import com.ryanddawkins.prephelper.data.storage.RetrievalException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by ryan on 10/11/15.
@@ -112,6 +116,70 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
         }
         prepItem.setACL(parseACL);
         prepItem.saveInBackground();
+    }
+
+    @Override
+    public void getItemsNotInPrepAsync(final GetObjectCallback<Item> callback, Prep prep) {
+
+        ParseQuery<PrepItem> prepItemParseQuery = ParseQuery.getQuery(PrepItem.class);
+        prepItemParseQuery.whereEqualTo("user", this.currentUser);
+        prepItemParseQuery.whereEqualTo("prep", prep);
+
+        prepItemParseQuery.findInBackground(new FindCallback<PrepItem>() {
+            @Override
+            public void done(List<PrepItem> list, ParseException e) {
+                if(e != null) {
+                    throw new RetrievalException(e.getMessage());
+                }
+
+                ParseQuery<Item> itemParseQuery = ParseQuery.getQuery(Item.class);
+                itemParseQuery.whereEqualTo("user", currentUser);
+
+                ArrayList<String> items = new ArrayList<String>();
+                for(PrepItem prepItem : list) {
+                    items.add(prepItem.getItem().getObjectId());
+                }
+                itemParseQuery.whereNotContainedIn("objectId", items);
+
+                itemParseQuery.findInBackground(new FindCallback<Item>() {
+                    @Override
+                    public void done(List<Item> list, ParseException e) {
+                        if (e == null) {
+                            Log.d("getItemsAsync", "List size: "+list.size());
+                            for(Item item : list) {
+                                callback.gotObjectCallback(item);
+                            }
+                        } else {
+                            throw new RetrievalException(e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    @Override
+    public void addToPrepAsync(final AddedItemToPrepCallback callback, Prep prep, Item item) {
+
+        PrepItem prepItem = new PrepItem();
+        prepItem.setPrep(prep);
+        prepItem.setItem(item);
+        prepItem.put("user", this.currentUser);
+
+        ParseACL parseACL = new ParseACL(this.currentUser);
+        prepItem.setACL(parseACL);
+
+        prepItem.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                callback.addItemToPrep();
+                if(e != null) {
+                    Timber.e(e.getMessage());
+                }
+            }
+        });
+
     }
 
     private List<Item> getItemsFromPrepItems(final GetObjectCallback<Item> callback, List<PrepItem> prepItems) {

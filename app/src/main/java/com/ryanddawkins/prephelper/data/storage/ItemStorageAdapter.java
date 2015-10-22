@@ -21,4 +21,8 @@ public interface ItemStorageAdapter {
 
     void createItem(final Prep prep, final Item item);
 
+    void getItemsNotInPrepAsync(final GetObjectCallback<Item> callback, Prep prep);
+
+    void addToPrepAsync(final AddedItemToPrepCallback callback, Prep prep, Item item);
+
 }

@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -83,9 +82,6 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        MenuInflater menuInflater = this.getMenuInflater();
-        menuInflater.inflate(R.menu.menu_preps, menu);
         return true;
     }
 
@@ -93,10 +89,7 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int itemId = item.getItemId();
-
         switch(itemId) {
-            case R.id.action_add_existing_item:
-                Timber.d("YAY");
         }
 
         return super.onOptionsItemSelected(item);

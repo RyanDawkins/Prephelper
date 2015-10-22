@@ -18,9 +18,9 @@ import java.util.List;
 public class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
 
     private List<Item> items;
-    private ItemCallback<View> itemCallback;
+    private ItemCallback<Integer> itemCallback;
 
-    public ItemsAdapter(@NonNull List<Item> items, @NonNull ItemCallback<View> itemCallback) {
+    public ItemsAdapter(@NonNull List<Item> items, @NonNull ItemCallback<Integer> itemCallback) {
         this.items = items;
         this.itemCallback = itemCallback;
     }
@@ -34,6 +34,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemHolder> {
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
         Item item = this.items.get(position);
+        holder.setPosition(position);
         holder.setNameViewText(item.getName());
         holder.setItemViewTag(R.id.item, item);
     }
