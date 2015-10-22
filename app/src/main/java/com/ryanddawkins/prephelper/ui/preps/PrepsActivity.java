@@ -52,13 +52,6 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!PrepHelperApp.getInstance().getLoginAdapter().isLoggedIn()) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            this.startActivity(intent);
-        }
-
         this.setTitle(getString(R.string.preps_heading));
 
         this.self = this;
@@ -66,12 +59,24 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
         // Adding layout to container
         FrameLayout container = this.addLayoutToContainer(R.layout.activity_preps);
         //ButterKnife.bind(this, container);
+    }
 
-        this.prepStorageAdapter = PrepHelperApp.getInstance().getPrepStorageAdapter();
+    @Override public void onStart() {
+        super.onStart();
     }
 
     @Override public void onResume() {
         super.onResume();
+
+        if(!PrepHelperApp.getInstance().getLoginAdapter().isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            this.startActivity(intent);
+            return;
+        }
+
+        this.prepStorageAdapter = PrepHelperApp.getInstance().getPrepStorageAdapter();
 
         if(this.prepsRecyclerView != null) {
             this.prepsAdapter = new PrepsAdapter(new ArrayList<Prep>(), this);
