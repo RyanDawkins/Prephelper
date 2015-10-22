@@ -29,11 +29,18 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
         this.currentUser = ParseUser.getCurrentUser();
     }
 
+    public ParseUser getCurrentUser() {
+        if(this.currentUser == null) {
+            this.currentUser = ParseUser.getCurrentUser();
+        }
+        return this.currentUser;
+    }
+
     @Override
     public List<Prep> getPreps() {
 
         ParseQuery<Prep> query = ParseQuery.getQuery(Prep.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
 
         try {
             return query.find();
@@ -45,7 +52,7 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
 
     @Override public void getPrepsAsync(final GetAllCallback<Prep> callback) {
         ParseQuery<Prep> query = ParseQuery.getQuery(Prep.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
 
         query.findInBackground(new FindCallback<Prep>() {
             @Override
@@ -63,10 +70,10 @@ public class ParsePrepStorageAdapter implements PrepStorageAdapter {
     @Override
     public void createPrep(Prep prep) {
 
-        prep.put("user", this.currentUser);
+        prep.put("user", this.getCurrentUser());
 
         // Restricting access to only this user.
-        prep.setACL(new ParseACL(this.currentUser));
+        prep.setACL(new ParseACL(this.getCurrentUser()));
 
 
         try {

@@ -47,6 +47,7 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
     private PrepStorageAdapter prepStorageAdapter;
     private PrepsActivity self;
     private List<Prep> prepsList;
+    private PrepsAdapter prepsAdapter;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +59,8 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
             this.startActivity(intent);
         }
 
+        this.setTitle(getString(R.string.preps_heading));
+
         this.self = this;
 
         // Adding layout to container
@@ -65,19 +68,19 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
         //ButterKnife.bind(this, container);
 
         this.prepStorageAdapter = PrepHelperApp.getInstance().getPrepStorageAdapter();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
 
         if(this.prepsRecyclerView != null) {
-            this.prepsRecyclerView.setAdapter(new PrepsAdapter(new ArrayList<Prep>(), this));
+            this.prepsAdapter = new PrepsAdapter(new ArrayList<Prep>(), this);
+            this.prepsRecyclerView.setAdapter(this.prepsAdapter);
             this.prepStorageAdapter.getPrepsAsync(this);
             this.prepsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         } else {
             Log.w("PrepsActivity", "Preps Recyclerview is nt present.");
         }
-    }
-
-    @Override public void onStart() {
-        super.onStart();
-        setTitle(getString(R.string.preps_heading));
     }
 
     @Override
@@ -97,8 +100,8 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
     public void updateListAdapter(List<Prep> preps) {
         if(this.prepsRecyclerView != null) {
-            this.prepsRecyclerView.setAdapter(new PrepsAdapter(preps, this));
-            this.prepsRecyclerView.getAdapter().notifyDataSetChanged();
+            this.prepsAdapter.replacePreps(preps);
+            Timber.d("Preps length: "+preps.size());
             this.showToast("should show data");
         } else {
             Log.w("PrepsActivity", "recyclerview is null");
@@ -121,7 +124,7 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
                     public void onInput(MaterialDialog dialog, CharSequence input) {
                         prep.setName(input.toString());
                         prepStorageAdapter.savePrepAsync(prep);
-                        prepsRecyclerView.getAdapter().notifyDataSetChanged();
+                        prepsAdapter.addPrep(prep);
                     }
                 }).build();
         materialDialog.show();
@@ -141,7 +144,6 @@ public class PrepsActivity extends BaseDrawerActivity implements ItemCallback<Vi
 
                         Prep prep = new Prep();
                         prep.setName(prepName);
-
 
                         self.prepStorageAdapter.createPrep(prep);
                         self.prepStorageAdapter.getPrepsAsync(self);

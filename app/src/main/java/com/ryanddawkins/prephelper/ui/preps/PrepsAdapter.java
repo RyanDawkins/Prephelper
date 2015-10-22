@@ -38,6 +38,21 @@ public class PrepsAdapter extends RecyclerView.Adapter<PrepHolder> {
         holder.setItemViewTag(R.id.prep, prep);
     }
 
+    public void addPrep(Prep i) {
+        this.preps.add(i);
+        notifyItemChanged(preps.size() - 1);
+    }
+
+    public void addList(List<Prep> preps) {
+        this.preps.addAll(preps);
+        notifyDataSetChanged();
+    }
+
+    public void replacePreps(List<Prep> preps) {
+        this.preps = preps;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return this.preps != null ? this.preps.size() : 0;

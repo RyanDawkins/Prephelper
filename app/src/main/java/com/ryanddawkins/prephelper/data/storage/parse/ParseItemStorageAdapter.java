@@ -35,10 +35,17 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
         this.currentUser = ParseUser.getCurrentUser();
     }
 
+    public ParseUser getCurrentUser() {
+        if(this.currentUser == null) {
+            this.currentUser = ParseUser.getCurrentUser();
+        }
+        return this.currentUser;
+    }
+
     @Override
     public List<Item> getItems(Prep prep) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
         query.whereEqualTo("prep", prep);
 
         try {
@@ -51,10 +58,10 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     @Override
     public void getItemsAsync(final GetObjectCallback<Item> callback, Prep prep) {
         ParseQuery<PrepItem> query = ParseQuery.getQuery(PrepItem.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
         query.whereEqualTo("prep", prep);
 
-        Log.d("getItemsAsync", "User Object ID: " + this.currentUser.getObjectId());
+        Log.d("getItemsAsync", "User Object ID: " + this.getCurrentUser().getObjectId());
         Log.d("getItemsAsync", "User Prep ID: "+prep.getObjectId());
         Log.d("getItemsAsync", "Prep Name: "+prep.getName());
 
@@ -74,7 +81,7 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     @Override
     public List<Item> getItems() {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
 
         try {
             return query.find();
@@ -86,7 +93,7 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     @Override
     public void getItemsAsync(final GetAllCallback<Item> callback) {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class);
-        query.whereEqualTo("user", this.currentUser);
+        query.whereEqualTo("user", this.getCurrentUser());
 
         query.findInBackground(new FindCallback<Item>() {
             @Override
@@ -103,13 +110,13 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     @Override
     public void createItem(final Prep prep, final Item item) {
 
-        ParseACL parseACL = new ParseACL(this.currentUser);
+        ParseACL parseACL = new ParseACL(this.getCurrentUser());
 
-        item.put("user", this.currentUser);
+        item.put("user", this.getCurrentUser());
         item.setACL(parseACL);
 
         PrepItem prepItem = new PrepItem();
-        prepItem.put("user", this.currentUser);
+        prepItem.put("user", this.getCurrentUser());
         prepItem.setItem(item);
         if(prep != null) {
             prepItem.setPrep(prep);
@@ -122,7 +129,7 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     public void getItemsNotInPrepAsync(final GetObjectCallback<Item> callback, Prep prep) {
 
         ParseQuery<PrepItem> prepItemParseQuery = ParseQuery.getQuery(PrepItem.class);
-        prepItemParseQuery.whereEqualTo("user", this.currentUser);
+        prepItemParseQuery.whereEqualTo("user", this.getCurrentUser());
         prepItemParseQuery.whereEqualTo("prep", prep);
 
         prepItemParseQuery.findInBackground(new FindCallback<PrepItem>() {
@@ -133,7 +140,7 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
                 }
 
                 ParseQuery<Item> itemParseQuery = ParseQuery.getQuery(Item.class);
-                itemParseQuery.whereEqualTo("user", currentUser);
+                itemParseQuery.whereEqualTo("user", getCurrentUser());
 
                 ArrayList<String> items = new ArrayList<String>();
                 for(PrepItem prepItem : list) {
@@ -165,9 +172,9 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
         PrepItem prepItem = new PrepItem();
         prepItem.setPrep(prep);
         prepItem.setItem(item);
-        prepItem.put("user", this.currentUser);
+        prepItem.put("user", this.getCurrentUser());
 
-        ParseACL parseACL = new ParseACL(this.currentUser);
+        ParseACL parseACL = new ParseACL(this.getCurrentUser());
         prepItem.setACL(parseACL);
 
         prepItem.saveInBackground(new SaveCallback() {
