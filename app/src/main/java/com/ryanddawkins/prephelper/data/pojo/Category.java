@@ -6,7 +6,7 @@ import com.parse.ParseObject;
 /**
  * Created by ryan on 9/27/15.
  */
-@ParseClassName("category")
+@ParseClassName("Category")
 public class Category extends ParseObject {
 
     public String getName() {
@@ -17,4 +17,9 @@ public class Category extends ParseObject {
         put("name", name);
         return this;
     }
+
+    public String getId() {
+        return this.getObjectId();
+    }
+
 }

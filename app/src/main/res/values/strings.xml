@@ -30,4 +30,7 @@
     <string name="action_preps">Preps</string>
     <string name="action_items">Items</string>
 
+    <!-- Item Detail Strings -->
+    <string name="item_name_hint">Name</string>
+
 </resources>

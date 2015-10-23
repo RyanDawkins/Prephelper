@@ -16,6 +16,7 @@ import com.ryanddawkins.prephelper.data.pojo.Prep;
 import com.ryanddawkins.prephelper.data.pojo.PrepItem;
 import com.ryanddawkins.prephelper.data.storage.AddedItemToPrepCallback;
 import com.ryanddawkins.prephelper.data.storage.GetAllCallback;
+import com.ryanddawkins.prephelper.data.storage.GetByIdCallback;
 import com.ryanddawkins.prephelper.data.storage.ItemStorageAdapter;
 import com.ryanddawkins.prephelper.data.storage.RetrievalException;
 
@@ -126,6 +127,11 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
     }
 
     @Override
+    public void saveItem(Item item) {
+        item.saveInBackground();
+    }
+
+    @Override
     public void getItemsNotInPrepAsync(final GetObjectCallback<Item> callback, Prep prep) {
 
         ParseQuery<PrepItem> prepItemParseQuery = ParseQuery.getQuery(PrepItem.class);
@@ -187,6 +193,17 @@ public class ParseItemStorageAdapter implements ItemStorageAdapter {
             }
         });
 
+    }
+
+    @Override
+    public void getItemAsync(final GetByIdCallback<Item> callback, String itemId) {
+        ParseQuery<Item> itemParseQuery = ParseQuery.getQuery(Item.class);
+        itemParseQuery.getInBackground(itemId, new GetCallback<Item>() {
+            @Override
+            public void done(Item item, ParseException e) {
+                callback.gotById(item);
+            }
+        });
     }
 
     private List<Item> getItemsFromPrepItems(final GetObjectCallback<Item> callback, List<PrepItem> prepItems) {

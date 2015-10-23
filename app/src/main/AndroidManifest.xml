@@ -25,6 +25,8 @@
         </activity>
         <activity android:name=".ui.items.ItemsActivity"
             android:label="@string/items_heading"></activity>
+        <activity android:name=".ui.items.detail.ItemDetailActivity" android:label="Edit Item">
+        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5821b308d11f4ace82358e89355bbb98576f5891" />

@@ -26,6 +26,7 @@ import com.ryanddawkins.prephelper.data.storage.GetByIdCallback;
 import com.ryanddawkins.prephelper.data.storage.parse.ParseItemStorageAdapter;
 import com.ryanddawkins.prephelper.data.storage.parse.ParsePrepStorageAdapter;
 import com.ryanddawkins.prephelper.ui.ItemCallback;
+import com.ryanddawkins.prephelper.ui.items.detail.ItemDetailActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,6 +93,7 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<In
 
         this.selectedMap = new HashMap<Integer, Boolean>();
         if(prepId != null) {
+            this.enableBackNav();
             ParsePrepStorageAdapter parsePrepStorageAdapter = new ParsePrepStorageAdapter();
             parsePrepStorageAdapter.getPrepByIdAsync(this, prepId);
         } else {
@@ -236,9 +238,11 @@ public class ItemsActivity extends BaseDrawerActivity implements ItemCallback<In
                 wasSelected = (boolean) this.selectedMap.get(position);
             }
             this.selectItem(wasSelected, position);
-
         } else {
-            this.showToast(item.getName());
+
+            Intent intent = new Intent(this, ItemDetailActivity.class);
+            intent.putExtra(ItemDetailActivity.ITEM, item.getId());
+            this.startActivity(intent);
         }
     }
 
